@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <unordered_map>
 int polsiz = 16;
 int snakespeed = 2;
 int dbarrier = 0;
@@ -101,6 +102,41 @@ void block::spawn(int a, int b)
     active = 1;
     x = a;
     y = b;
+}
+//-----------------------------------------------------
+
+//----------------новые функции-----------------
+std::unordered_map<int, bool> previousKeyState;
+bool IsKeyJustPressed(int key) {
+    bool isKeyPressed = (GetAsyncKeyState(key) & 0x8000) != 0;
+    bool wasKeyPressed = previousKeyState[key];
+    previousKeyState[key] = isKeyPressed;
+    return isKeyPressed && !wasKeyPressed;
+}
+bool IsKeyPressed(int key) {
+    return (GetAsyncKeyState(key) & 0x8000) != 0;
+}
+void WaitKeyPress(int key) {
+    while (true) {
+        if (IsKeyPressed(key)) {
+            return;
+        }
+    }
+}
+int CyclicSwitch(int val, int min, int max, bool increase) {
+    if (increase) {
+        val++;
+    }
+    else {
+        val--;
+    }
+    if (val > max) {
+        val = min;
+    }
+    if (val < min) {
+        val = max;
+    }
+    return val;
 }
 //-----------------------------------------------------
 
@@ -964,35 +1000,19 @@ int main()
         {
             std::cout << "Your best score: " << bestscore << "\n\nMENU:\n";
 
-            if (vibor == 1)
-                std::cout << ">";
-            else
-                std::cout << " ";
-            std::cout << "Play\n";
-
-            if (vibor == 2)
-                std::cout << ">";
-            else
-                std::cout << " ";
-            std::cout << "Settings\n";
-
-            if (vibor == 3)
-                std::cout << ">";
-            else
-                std::cout << " ";
-            std::cout << "Help\n";
-
-            if (vibor == 4)
-                std::cout << ">";
-            else
-                std::cout << " ";
-            std::cout << "Authors\n";
-
-            if (vibor == 5)
-                std::cout << ">";
-            else
-                std::cout << " ";
-            std::cout << "Save and exit\n";
+            std::string menu_units[5]{"Play", "Settings", "Help", "Authors", "Save and exit"};
+            for (int i = 0; i < 5; i++)
+            {
+                if (i == vibor - 1)
+                {
+                    std::cout << ">";
+                }
+                else
+                {
+                    std::cout << " ";
+                }
+                std::cout << menu_units[i] << "\n";
+            }
 
             while (1)
             {
@@ -1009,23 +1029,21 @@ int main()
                     dolgnaz = 0;
                 }
 
-                if (GetAsyncKeyState(87) == -32768 && GetAsyncKeyState(83) == 0 && dolgnaz != 1)
+                if (IsKeyJustPressed(87))
                 {
                     vibor--;
                     if (vibor < 1)
                         vibor = 5;
-                    dolgnaz = 1;
                     break;
                 }
-                if (GetAsyncKeyState(83) == -32768 && GetAsyncKeyState(87) == 0 && dolgnaz != 2)
+                if (IsKeyJustPressed(83))
                 {
                     vibor++;
                     if (vibor > 5)
                         vibor = 1;
-                    dolgnaz = 2;
                     break;
                 }
-                if (GetAsyncKeyState(13) == -32768 && dolgnaz != 3)
+                if (IsKeyJustPressed(13))
                 {
                     if (vibor == 1)
                     {
@@ -1044,155 +1062,71 @@ int main()
                             setpainter(vibor2, skin, bestscore, need_record);
                             while (1) //Ждет нажатия клавиш в настройках
                             {
-                                if (GetAsyncKeyState(68) == 0 && dolgnaz == 4)
-                                {
-                                    dolgnaz = 0;
-                                }
-                                if (GetAsyncKeyState(65) == 0 && dolgnaz == 5)
-                                {
-                                    dolgnaz = 0;
-                                }
-                                if (GetAsyncKeyState(13) == 0 && dolgnaz == 3)
-                                {
-                                    dolgnaz = 0;
-                                }
-                                if (GetAsyncKeyState(87) == 0 && dolgnaz == 1)
-                                {
-                                    dolgnaz = 0;
-                                }
-                                if (GetAsyncKeyState(83) == 0 && dolgnaz == 2)
-                                {
-                                    dolgnaz = 0;
-                                }
-                                if (GetAsyncKeyState(87) == -32768 && dolgnaz != 1)
+                                if (IsKeyJustPressed(87))
                                 {
                                     vibvect = 1;
-                                    dolgnaz = 1;
                                     break;
                                 }
-                                else
+                                if (IsKeyJustPressed(83))
                                 {
-                                    if (GetAsyncKeyState(83) == -32768 && dolgnaz != 2)
-                                    {
-                                        vibvect = 3;
-                                        dolgnaz = 2;
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        if (GetAsyncKeyState(68) == -32768 && dolgnaz != 4)
-                                        {
-                                            vibvect = 2;
-                                            dolgnaz = 4;
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            if (GetAsyncKeyState(65) == -32768 && dolgnaz != 5)
-                                            {
-                                                vibvect = 4;
-                                                dolgnaz = 5;
-                                                break;
-                                            }
-                                            else
-                                            {
-                                                if (GetAsyncKeyState(13) == -32768 && dolgnaz != 3)
-                                                {
-                                                    vibvect = 5;
-                                                    dolgnaz = 3;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
+                                    vibvect = 3;
+                                    break;
+                                }
+                                if (IsKeyJustPressed(68))
+                                {
+                                    vibvect = 2;
+                                    break;
+                                }
+                                if (IsKeyJustPressed(65))
+                                {
+                                    vibvect = 4;
+                                    break;
+                                }
+                                if (IsKeyJustPressed(13))
+                                {
+                                    vibvect = 5;
+                                    break;
                                 }
                             }
-                            if ((vibvect == 1) || (vibvect == 3)) //Либо скроллит вверх - вниз
+                            if (vibvect == 1)
                             {
-                                if (vibvect == 3)
+                                vibor2 = CyclicSwitch(vibor2, 1, 7, false);
+                            }
+                            if (vibvect == 3)
+                            {
+                                vibor2 = CyclicSwitch(vibor2, 1, 7, true);
+                            }
+                            if (vibvect == 5 && vibor2 == 7)
+                            {
+                                dubleexit = 1;
+                            }
+                            if (vibvect == 5 && vibor2 == 6)
+                            {
+                                if (ask_clear(&dolgnaz))
                                 {
-                                    vibor2++;
-                                    if (vibor2 > 7)
-                                        vibor2 = 1;
-                                }
-                                else
-                                {
-                                    vibor2--;
-                                    if (vibor2 < 1)
-                                        vibor2 = 7;
+                                    clear(&bestscore);
                                 }
                             }
-                            else //Либо настраивает (влево - вправо, ентер)
+                            if (vibvect == 5 && vibor2 == 5)
                             {
-                                if (vibvect == 5 && vibor2 == 7)
+                                sav(&bestscore);
+                            }
+                            if (vibvect == 2 || vibvect == 4)
+                            {
+                                switch (vibor2)
                                 {
-                                    dubleexit = 1;
-                                }
-                                else if (vibvect == 5 && vibor2 == 6)
-                                {
-                                    if (ask_clear(&dolgnaz))
-                                    {
-                                        clear(&bestscore);
-                                    }
-                                }
-                                else if (vibvect == 5 && vibor2 == 5)
-                                {
-                                    sav(&bestscore);
-                                }
-                                else
-                                {
-                                    if (vibvect == 2)
-                                    {
-                                        switch (vibor2)
-                                        {
-                                        case 1:
-                                            polsiz++;
-                                            if (polsiz > 32)
-                                                polsiz = 16;
-                                            break;
-                                        case 2:
-                                            snakespeed++;
-                                            if (snakespeed > 10)
-                                                snakespeed = 2;
-                                            break;
-                                        case 3:
-                                            dbarrier++;
-                                            if (dbarrier > 1)
-                                                dbarrier = 0;
-                                            break;
-                                        case 4:
-                                            numskin++;
-                                            if (numskin > 10)
-                                                numskin = 1;
-                                            break;
-                                        }
-                                    }
-                                    if (vibvect == 4)
-                                    {
-                                        switch (vibor2)
-                                        {
-                                        case 1:
-                                            polsiz--;
-                                            if (polsiz < 16)
-                                                polsiz = 32;
-                                            break;
-                                        case 2:
-                                            snakespeed--;
-                                            if (snakespeed < 2)
-                                                snakespeed = 10;
-                                            break;
-                                        case 3:
-                                            dbarrier--;
-                                            if (dbarrier < 0)
-                                                dbarrier = 1;
-                                            break;
-                                        case 4:
-                                            numskin--;
-                                            if (numskin < 1)
-                                                numskin = 10;
-                                            break;
-                                        }
-                                    }
+                                case 1:
+                                    polsiz = CyclicSwitch(polsiz, 16, 32, vibvect == 2);
+                                    break;
+                                case 2:
+                                    snakespeed = CyclicSwitch(snakespeed, 2, 10, vibvect == 2);
+                                    break;
+                                case 3:
+                                    dbarrier = CyclicSwitch(dbarrier, 0, 1, vibvect == 2);
+                                    break;
+                                case 4:
+                                    numskin = CyclicSwitch(numskin, 1, 10, vibvect == 2);
+                                    break;
                                 }
                             }
                             //вот здесь начинается обработка выбора и скроллов
@@ -1213,54 +1147,15 @@ int main()
                     }
                     if (vibor == 3)
                     {
-                        dubleexit = 0;
                         system("cls");
                         std::cout << "Help:\n(w, a, s, d) - control\n(Enter) - interaction\n>Back\n";
-                        dolgnaz = 3;
-                        while (1)
-                        {
-                            if (GetAsyncKeyState(13) == 0)
-                            {
-                                dolgnaz = 0;
-                            }
-                            if (GetAsyncKeyState(13) == -32768 && dolgnaz != 3)
-                            {
-                                dolgnaz = 3;
-                                dubleexit = 1;
-                                break;
-                            }
-                        }
-                        if (dubleexit == 1)
-                        {
-                            dubleexit = 0;
-                            system("cls");
-                            break;
-                        }
+                        WaitKeyPress(13);
                     }
                     if (vibor == 4)
                     {
                         system("cls");
                         std::cout << "Authors:\nProgramming - Nikitos\nGraphic - Nikitos\nAnimations - Nikitos\nPhysics - Nikitos\nVoice acting - Nikitos\n>Back\n";
-                        dolgnaz = 3;
-                        while (1)
-                        {
-                            if (GetAsyncKeyState(13) == 0)
-                            {
-                                dolgnaz = 0;
-                            }
-                            if (GetAsyncKeyState(13) == -32768 && dolgnaz != 3)
-                            {
-                                dolgnaz = 3;
-                                dubleexit = 1;
-                                break;
-                            }
-                        }
-                        if (dubleexit == 1)
-                        {
-                            dubleexit = 0;
-                            system("cls");
-                            break;
-                        }
+                        WaitKeyPress(13);
                     }
                     if (vibor == 5)
                     {
