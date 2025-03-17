@@ -11,6 +11,9 @@ int snakespeed = 2;
 int dbarrier = 0;
 int numskin = 1;
 int squareps;
+
+
+
 class cell
 {
 public:
