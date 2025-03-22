@@ -208,119 +208,47 @@ void spawn_location_selection(int* x, int* y, int place[32][32])
 }
 
 //Обработка смерти-------------------------------------
-int rest(int a, int b)
+int rest(int a)
 {
-    a = a + b;
     if (a == polsiz)
     {
         a = 0;
     }
-    else
+    else if(a == -1)
     {
-        if (a == -1)
-        {
-            a = polsiz - 1;
-        }
+        a = polsiz - 1;
     }
     return a;
 }
-int dead(block snakeb, int place[32][32], int l, int a, int b)
+int dead(block snakeb, int place[32][32], int l)
 {
+    int x_delta = 0;
+    int y_delta = 0;
+    if (l == 1) {
+        y_delta = -1;
+    }
+    else if (l == 2) {
+        x_delta = 1;
+    }
+    else if (l == 3) {
+        y_delta = 1;
+    }
+    else {
+        x_delta = -1;
+    }
+    std::cout << x_delta << ";" << y_delta;
+    int x_next = snakeb.x + x_delta;
+    int y_next = snakeb.y + y_delta;
     if (dbarrier == 1)
     {
-        if ((place[rest(snakeb.y, -1)][snakeb.x] == 1 && l == 1) || (snakeb.y == 0 && l == 1))
-        {
+        if (x_next == -1 || x_next == polsiz) {
             return 1;
         }
-        else
-        {
-            if (place[rest(snakeb.y, -1)][snakeb.x] == 2 && l == 1)
-            {
-                return 2;
-            }
-        }
-        if ((place[snakeb.y][rest(snakeb.x, 1)] == 1 && l == 2) || (snakeb.x == polsiz - 1 && l == 2))
-        {
+        if (y_next == -1 || y_next == polsiz) {
             return 1;
-        }
-        else
-        {
-            if (place[snakeb.y][rest(snakeb.x, 1)] == 2 && l == 2)
-            {
-                return 2;
-            }
-        }
-        if ((place[rest(snakeb.y, 1)][snakeb.x] == 1 && l == 3) || (snakeb.y == polsiz - 1 && l == 3))
-        {
-            return 1;
-        }
-        else
-        {
-            if (place[rest(snakeb.y, 1)][snakeb.x] == 2 && l == 3)
-            {
-                return 2;
-            }
-        }
-        if ((place[snakeb.y][rest(snakeb.x, -1)] == 1 && l == 4) || (snakeb.x == 0 && l == 4))
-        {
-            return 1;
-        }
-        else
-        {
-            if (place[snakeb.y][rest(snakeb.x, -1)] == 2 && l == 4)
-            {
-                return 2;
-            }
         }
     }
-    else
-    {
-        if (place[rest(snakeb.y, -1)][snakeb.x] == 1 && l == 1)
-        {
-            return 1;
-        }
-        else
-        {
-            if (place[rest(snakeb.y, -1)][snakeb.x] == 2 && l == 1)
-            {
-                return 2;
-            }
-        }
-        if (place[snakeb.y][rest(snakeb.x, 1)] == 1 && l == 2)
-        {
-            return 1;
-        }
-        else
-        {
-            if (place[snakeb.y][rest(snakeb.x, 1)] == 2 && l == 2)
-            {
-                return 2;
-            }
-        }
-        if (place[rest(snakeb.y, 1)][snakeb.x] == 1 && l == 3)
-        {
-            return 1;
-        }
-        else
-        {
-            if (place[rest(snakeb.y, 1)][snakeb.x] == 2 && l == 3)
-            {
-                return 2;
-            }
-        }
-        if (place[snakeb.y][rest(snakeb.x, -1)] == 1 && l == 4)
-        {
-            return 1;
-        }
-        else
-        {
-            if (place[snakeb.y][rest(snakeb.x, -1)] == 2 && l == 4)
-            {
-                return 2;
-            }
-        }
-    }
-    return 0;
+    return place[rest(y_next)][rest(x_next)];
 }
 //-----------------------------------------------------
 void fullzapis(char* inpstr, const char* outstr, int inlenth)
@@ -938,7 +866,7 @@ int snake(char skin[4], bool* snake_exit, int* dolgnaz)
                 }
             }
         }
-        col = dead(snakeb[0], place, vector, ud, lr);
+        col = dead(snakeb[0], place, vector);
         if (col == 1)
         {
             return score;
