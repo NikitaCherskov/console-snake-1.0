@@ -127,7 +127,17 @@ bool IsKeyPressed(int key) {
 
 void WaitKeyPress(int key) {
     while (true) {
-        if (IsKeyPressed(key)) {
+        if (IsKeyJustPressed(key)) {
+            return;
+        }
+    }
+}
+
+
+
+void WaitKeyJustPress(int key) {
+    while (true) {
+        if (IsKeyJustPressed(key)) {
             return;
         }
     }
@@ -500,48 +510,36 @@ void char_to_char_adder(char* canvas, const char str_for_add[])
 int painter(int place[32][32], int score, char skin[4])
 {
     char* canvas = new char[3500]{ "" };
-    int a = 0;
-    int b = 0;
-    int c = 0;
-    while (c < polsiz)
+    for (int i = 0; i < polsiz; i++)
     {
         char_to_char_adder(canvas, "---");
-        c++;
     }
     char_to_char_adder(canvas, "--\tscore:");
     char_to_int_adder(canvas, score);
     char_to_char_adder(canvas, "\n");
-    while (b < polsiz)
+    for (int i = 0; i < polsiz; i++)
     {
-        a = 0;
         char_to_char_adder(canvas, "|");
-        while (a < polsiz)
+        for (int j = 0; j < polsiz; j++)
         {
-            if (place[b][a] == 1)
+            if (place[i][j] == 1)
             {
                 char_to_char_adder(canvas, skin);
             }
+            else if(place[i][j] == 2)
+            {
+                char_to_char_adder(canvas, "(*)");
+            }
             else
             {
-                if (place[b][a] == 2)
-                {
-                    char_to_char_adder(canvas, "(*)");
-                }
-                else
-                {
-                    char_to_char_adder(canvas, "   ");
-                }
+                char_to_char_adder(canvas, "   ");
             }
-            a++;
         }
         char_to_char_adder(canvas, "|\n");
-        b++;
     }
-    c = 0;
-    while (c < polsiz)
+    for (int i = 0; i < polsiz; i++)
     {
         char_to_char_adder(canvas, "---");
-        c++;
     }
     char_to_char_adder(canvas, "--\n");
     std::cout << canvas;
@@ -581,7 +579,7 @@ void ask_print(int choose, const char* text)
 
 
 
-bool ask(int* dolgnaz, const char* text)
+bool ask(const char* text)
 {
     int choose = 1;
     while (true)
@@ -606,7 +604,7 @@ bool ask(int* dolgnaz, const char* text)
 
 
 
-int snake(char skin[4], bool* snake_exit, int* dolgnaz)
+int snake(char skin[4], bool* snake_exit)
 {
     squareps = polsiz * polsiz;
     bool first_launch = 1;
@@ -683,7 +681,7 @@ int snake(char skin[4], bool* snake_exit, int* dolgnaz)
             }
             else if (IsKeyPressed(27))
             {
-                if (ask(dolgnaz, ep_ask) == 1)
+                if (ask(ep_ask) == 1)
                 {
                     *snake_exit = 1;
                     return score;
@@ -735,199 +733,148 @@ bool skin_check(int bestscore, short need_record[10])
 
 
 
+void settingsProcess(char* skin, int best_score, short* need_record) {
+    system("cls");
+    int vibvect = 1;
+    int vibor2 = 1;
+    bool exit = false;
+    while (!exit)
+    {
+        setskin(skin);
+        drawSettings(vibor2, skin, best_score, need_record);
+
+        if (IsKeyJustPressed(87))
+        {
+            vibor2 = CyclicSwitch(vibor2, 1, 7, false);
+        }
+        if (IsKeyJustPressed(83))
+        {
+            vibor2 = CyclicSwitch(vibor2, 1, 7, true);
+        }
+        if (IsKeyJustPressed(13) && vibor2 == 7)
+        {
+            exit = true;
+        }
+        if (IsKeyJustPressed(13) && vibor2 == 6)
+        {
+            if (ask(cp_ask))
+            {
+                clear(&best_score);
+            }
+        }
+        if (IsKeyJustPressed(13) && vibor2 == 5)
+        {
+            sav(&best_score);
+        }
+        if (IsKeyJustPressed(68) || IsKeyJustPressed(65))
+        {
+            switch (vibor2)
+            {
+            case 1:
+                polsiz = CyclicSwitch(polsiz, 16, 32, IsKeyJustPressed(68));
+                break;
+            case 2:
+                snakespeed = CyclicSwitch(snakespeed, 2, 10, IsKeyJustPressed(68));
+                break;
+            case 3:
+                dbarrier = CyclicSwitch(dbarrier, 0, 1, IsKeyJustPressed(68));
+                break;
+            case 4:
+                numskin = CyclicSwitch(numskin, 1, 10, IsKeyJustPressed(68));
+                break;
+            }
+        }
+        system("cls");
+        vibvect = 1;
+    }
+    if (skin_check(best_score, need_record) == 0)
+    {
+        numskin = skin_max(best_score, need_record);
+        setskin(skin);
+    }
+    if (exit == true)
+    {
+        return;
+    }
+}
+
+
+
 int main()
 {
     bool snakeexit = 0;
     short need_record[10]{ 0, 50, 100, 200, 300, 400, 550, 700, 850, 1024 };
     char skin[4] = "";
-    int bestscore = 0;
+    int best_score = 0;
     int score = 0;
-    int vibvect = 1;
-    int dubleexit;
     int vibor = 1;
-    int vibor2 = 1;
-    int st;
-    int dolgnaz = 0;
-    lod(&bestscore);
+    bool exit = false;
+    lod(&best_score);
     srand(time(0));
     setskin(skin);
     while (1)
     {
-        st = 0;
-        while (st != 1)
+        exit = false;
+        while (!exit)
         {
-            std::cout << "Your best score: " << bestscore << "\n\nMENU:\n";
+            std::cout << "Your best score: " << best_score << "\n\nMENU:\n";
 
-            std::string menu_units[5]{"Play", "Settings", "Help", "Authors", "Save and exit"};
+            const char* menu_units[5]{"Play\n", "Settings\n", "Help\n", "Authors\n", "Save and exit\n"};
             for (int i = 0; i < 5; i++)
             {
-                if (i == vibor - 1)
-                {
-                    std::cout << ">";
-                }
-                else
-                {
-                    std::cout << " ";
-                }
-                std::cout << menu_units[i] << "\n";
+                PrintMenuUnit(menu_units[i], i + 1, vibor);
             }
 
-            while (1)
+            if (IsKeyJustPressed(87))
             {
-                if (GetAsyncKeyState(13) == 0 && dolgnaz == 3)
+                vibor = CyclicSwitch(vibor, 1, 5, false);
+            }
+            if (IsKeyJustPressed(83))
+            {
+                vibor = CyclicSwitch(vibor, 1, 5, true);
+            }
+            if (IsKeyJustPressed(13))
+            {
+                if (vibor == 1)
                 {
-                    dolgnaz = 0;
+                    score = snake(skin, &snakeexit);
                 }
-                if (GetAsyncKeyState(87) == 0 && dolgnaz == 1)
+                if (vibor == 2)
                 {
-                    dolgnaz = 0;
+                    settingsProcess(skin, best_score, need_record);
                 }
-                if (GetAsyncKeyState(83) == 0 && dolgnaz == 2)
+                if (vibor == 3)
                 {
-                    dolgnaz = 0;
+                    system("cls");
+                    std::cout << "Help:\n";
+                    std::cout << "(w, a, s, d) - control\n";
+                    std::cout << "(Enter) - interaction\n";
+                    std::cout << ">Back\n";
+                    WaitKeyPress(13);
                 }
-
-                if (IsKeyJustPressed(87))
+                if (vibor == 4)
                 {
-                    vibor--;
-                    if (vibor < 1)
-                        vibor = 5;
-                    break;
+                    system("cls");
+                    std::cout << "Authors:\n";
+                    std::cout << "Programming - Nikita\n";
+                    std::cout << "Graphic - Nikita\n";
+                    std::cout << "Animations - Nikita\n";
+                    std::cout << "Physics - Nikita\n";
+                    std::cout << "Voice acting - Nikita\n";
+                    std::cout << ">Back\n";
+                    WaitKeyPress(13);
                 }
-                if (IsKeyJustPressed(83))
+                if (vibor == 5)
                 {
-                    vibor++;
-                    if (vibor > 5)
-                        vibor = 1;
-                    break;
-                }
-                if (IsKeyJustPressed(13))
-                {
-                    if (vibor == 1)
-                    {
-                        st = 1;
-                        break;
-                    }
-                    if (vibor == 2) //Вход в настройки
-                    {
-                        dubleexit = 0;
-                        system("cls");
-                        vibor2 = 1;
-                        vibvect = 1;
-                        while (dubleexit == 0)
-                        {
-                            setskin(skin);
-                            drawSettings(vibor2, skin, bestscore, need_record);
-                            while (1) //Ждет нажатия клавиш в настройках
-                            {
-                                if (IsKeyJustPressed(87))
-                                {
-                                    vibvect = 1;
-                                    break;
-                                }
-                                if (IsKeyJustPressed(83))
-                                {
-                                    vibvect = 3;
-                                    break;
-                                }
-                                if (IsKeyJustPressed(68))
-                                {
-                                    vibvect = 2;
-                                    break;
-                                }
-                                if (IsKeyJustPressed(65))
-                                {
-                                    vibvect = 4;
-                                    break;
-                                }
-                                if (IsKeyJustPressed(13))
-                                {
-                                    vibvect = 5;
-                                    break;
-                                }
-                            }
-                            if (vibvect == 1)
-                            {
-                                vibor2 = CyclicSwitch(vibor2, 1, 7, false);
-                            }
-                            if (vibvect == 3)
-                            {
-                                vibor2 = CyclicSwitch(vibor2, 1, 7, true);
-                            }
-                            if (vibvect == 5 && vibor2 == 7)
-                            {
-                                dubleexit = 1;
-                            }
-                            if (vibvect == 5 && vibor2 == 6)
-                            {
-                                if (ask(&dolgnaz, cp_ask))
-                                {
-                                    clear(&bestscore);
-                                }
-                            }
-                            if (vibvect == 5 && vibor2 == 5)
-                            {
-                                sav(&bestscore);
-                            }
-                            if (vibvect == 2 || vibvect == 4)
-                            {
-                                switch (vibor2)
-                                {
-                                case 1:
-                                    polsiz = CyclicSwitch(polsiz, 16, 32, vibvect == 2);
-                                    break;
-                                case 2:
-                                    snakespeed = CyclicSwitch(snakespeed, 2, 10, vibvect == 2);
-                                    break;
-                                case 3:
-                                    dbarrier = CyclicSwitch(dbarrier, 0, 1, vibvect == 2);
-                                    break;
-                                case 4:
-                                    numskin = CyclicSwitch(numskin, 1, 10, vibvect == 2);
-                                    break;
-                                }
-                            }
-                            //вот здесь начинается обработка выбора и скроллов
-                            system("cls");
-                            vibvect = 1;
-                        }
-                        if (skin_check(bestscore, need_record) == 0)
-                        {
-                            numskin = skin_max(bestscore, need_record);
-                            setskin(skin);
-                        }
-                        if (dubleexit == 1)
-                        {
-                            dolgnaz = 3;
-                            dubleexit = 0;
-                            break;
-                        }
-                    }
-                    if (vibor == 3)
-                    {
-                        system("cls");
-                        std::cout << "Help:\n(w, a, s, d) - control\n(Enter) - interaction\n>Back\n";
-                        WaitKeyPress(13);
-                    }
-                    if (vibor == 4)
-                    {
-                        system("cls");
-                        std::cout << "Authors:\nProgramming - Nikitos\nGraphic - Nikitos\nAnimations - Nikitos\nPhysics - Nikitos\nVoice acting - Nikitos\n>Back\n";
-                        WaitKeyPress(13);
-                    }
-                    if (vibor == 5)
-                    {
-                        sav(&bestscore);
-                        return 0;
-                    }
+                    sav(&best_score);
+                    return 0;
                 }
             }
             system("cls");
         }
-        score = snake(skin, &snakeexit, &dolgnaz);
-        if (score > bestscore)
+        if (score > best_score)
         {
-            bestscore = score;
+            best_score = score;
         }
         system("cls");
         if (snakeexit == 1)
@@ -936,43 +883,21 @@ int main()
         }
         else
         {
+            const char* owr_txt_1 = "XXXX XXXX XX XX XXXX   XXXX  X  X XXXX X XX \n";
+            const char* owr_txt_2 = "X    X  X X X X X      X  X  X  X X    XX  X\n";
+            const char* owr_txt_3 = "X XX XXXX X X X XXXX   X  X  X  X XXXX X    \n";
+            const char* owr_txt_4 = "X  X X  X X X X X      X  X  X  X X    X    \n";
+            const char* owr_txt_5 = "XXXX X  X X X X XXXX   XXXX   XX  XXXX X    \n";
+            std::cout << owr_txt_1 << owr_txt_2 << owr_txt_3 << owr_txt_4 << owr_txt_5;
             if (score >= polsiz * polsiz)
             {
-                std::cout << "XXXX XXXX XX XX XXXX   XXXX  X  X XXXX X XX \nX    X  X X X X X      X  X  X  X X    XX  X\nX XX XXXX X X X XXXX   X  X  X  X XXXX X    ";
-                std::cout << "\nX  X X  X X X X X      X  X  X  X X    X    \nXXXX X  X X X X XXXX   XXXX   XX  XXXX X    \n\nYou won! You have reached the maximum value on this place!" << "\n\nYour score: ";
-                std::cout << score << "\n\n>Continue";
+                std::cout << "\n\nYou won! You have reached the maximum value on this place!";
             }
-            else
-            {
-                std::cout << "XXXX XXXX XX XX XXXX   XXXX  X  X XXXX X XX \nX    X  X X X X X      X  X  X  X X    XX  X\nX XX XXXX X X X XXXX   X  X  X  X XXXX X    ";
-                std::cout << "\nX  X X  X X X X X      X  X  X  X X    X    \nXXXX X  X X X X XXXX   XXXX   XX  XXXX X    \n\nYour score: " << score << "\n\n>Continue";
-            }
+            std::cout << "\n\nYour score : " << score << "\n\n>Continue";
         }
         snakeexit = 0;
-        while (1)
-        {
-            if (GetAsyncKeyState(13) == 0)
-            {
-                dolgnaz = 0;
-            }
-            if (GetAsyncKeyState(13) == -32768 && dolgnaz != 3)
-            {
-                dolgnaz = 3;
-                dubleexit = 1;
-                break;
-            }
-        }
+        WaitKeyPress(13);
         system("cls");
     }
     return 0;
 }
-// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
-// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
-
-// Советы по началу работы 
-//   1. В окне обозревателя решений можно добавлять файлы и управлять ими.
-//   2. В окне Team Explorer можно подключиться к системе управления версиями.
-//   3. В окне "Выходные данные" можно просматривать выходные данные сборки и другие сообщения.
-//   4. В окне "Список ошибок" можно просматривать ошибки.
-//   5. Последовательно выберите пункты меню "Проект" > "Добавить новый элемент", чтобы создать файлы кода, или "Проект" > "Добавить существующий элемент", чтобы добавить в проект существующие файлы кода.
-//   6. Чтобы снова открыть этот проект позже, выберите пункты меню "Файл" > "Открыть" > "Проект" и выберите SLN-файл.
