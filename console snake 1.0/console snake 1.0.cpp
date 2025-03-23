@@ -103,7 +103,10 @@ void block::spawn(int a, int b)
     x = a;
     y = b;
 }
-//-----------------------------------------------------
+
+
+
+
 
 //----------------новые функции-----------------
 std::unordered_map<int, bool> previousKeyState;
@@ -113,9 +116,15 @@ bool IsKeyJustPressed(int key) {
     previousKeyState[key] = isKeyPressed;
     return isKeyPressed && !wasKeyPressed;
 }
+
+
+
 bool IsKeyPressed(int key) {
     return (GetAsyncKeyState(key) & 0x8000) != 0;
 }
+
+
+
 void WaitKeyPress(int key) {
     while (true) {
         if (IsKeyPressed(key)) {
@@ -123,6 +132,9 @@ void WaitKeyPress(int key) {
         }
     }
 }
+
+
+
 int CyclicSwitch(int val, int min, int max, bool increase) {
     if (increase) {
         val++;
@@ -138,7 +150,21 @@ int CyclicSwitch(int val, int min, int max, bool increase) {
     }
     return val;
 }
-//-----------------------------------------------------
+
+
+
+void PrintMenuUnit(const char* text, int number, int choosen) {
+    if (choosen == number) {
+        std::cout << ">" << text;
+    }
+    else {
+        std::cout << " " << text;
+    }
+}
+
+
+
+
 
 //---------------сохранения и загрузки-----------------
 void sav(int* bestscore)
@@ -152,6 +178,9 @@ void sav(int* bestscore)
     saving.write((const char*)bestscore, sizeof *bestscore);
     saving.close();
 }
+
+
+
 void lod(int* bestscore)
 {
     std::ifstream loading;
@@ -163,6 +192,9 @@ void lod(int* bestscore)
     loading.read((char*)bestscore, sizeof * bestscore);
     loading.close();
 }
+
+
+
 void clear(int* bestscore)
 {
     std::fstream clear;
@@ -174,9 +206,12 @@ void clear(int* bestscore)
     numskin = 1;
     *bestscore = 0;
 }
+
+
+
+
+
 //-----------------------------------------------------
-
-
 void spawn_location_selection(int* x, int* y, int place[32][32])
 {
     int randcell;
@@ -206,6 +241,10 @@ void spawn_location_selection(int* x, int* y, int place[32][32])
     *x = emty_place[randcell].y;
     delete[] emty_place;
 }
+
+
+
+
 
 //Обработка смерти-------------------------------------
 int rest(int a)
@@ -250,6 +289,11 @@ int dead(block snakeb, int place[32][32], int l)
     }
     return place[rest(y_next)][rest(x_next)];
 }
+
+
+
+
+
 //-----------------------------------------------------
 void fullzapis(char* inpstr, const char* outstr, int inlenth)
 {
@@ -268,6 +312,9 @@ void fullzapis(char* inpstr, const char* outstr, int inlenth)
         inpstr++;
     }
 }
+
+
+
 void zapis(char skin[4], const char setch[4])
 {
     int i = 0;
@@ -278,6 +325,9 @@ void zapis(char skin[4], const char setch[4])
     }
     return;
 }
+
+
+
 void setskin(char skin[4])
 {
     int i = 0;
@@ -286,61 +336,12 @@ void setskin(char skin[4])
         skin[i] = '\0';
         i++;
     }
-    switch (numskin)
-    {
-    case 1:
-    {
-        zapis(skin, "|-|");
-    }
-    break;
-    case 2:
-    {
-        zapis(skin, "|=|");
-    }
-    break;
-    case 3:
-    {
-        zapis(skin, "|+|");
-    }
-    break;
-    case 4:
-    {
-        zapis(skin, "[-]");
-    }
-    break;
-    case 5:
-    {
-        zapis(skin, "[=]");
-    }
-    break;
-    case 6:
-    {
-        zapis(skin, "[+]");
-    }
-    break;
-    case 7:
-    {
-        zapis(skin, "(-)");
-    }
-    break;
-    case 8:
-    {
-        zapis(skin, "(=)");
-    }
-    break;
-    case 9:
-    {
-        zapis(skin, "(+)");
-    }
-    break;
-    case 10:
-    {
-        zapis(skin, "111");
-    }
-    break;
-    }
-    return;
+    const char* skins[10] = {"|-|", "|=|", "|+|", "[-]", "[=]", "[+]", "(-)", "(=)" , "(+)", "111"};
+    zapis(skin, skins[numskin - 1]);
 }
+
+
+
 void char_to_int_adder(char* canvas, int toadd)
 {
     std::string char_num = { "" };
@@ -358,63 +359,26 @@ void char_to_int_adder(char* canvas, int toadd)
         i2++;
     }
 }
+
+
+
 void setrank(char* nameskin, int can, int need_record)
 {
+    const char* ranks[10] = {
+        "Newbie",
+        "Beginning",
+        "Apprentice",
+        "Advanced",
+        "Professional",
+        "Specialist",
+        "Master",
+        "Best master",
+        "Legend",
+        "***BINARY MONSTER***"
+    };
     if (can == 1)
     {
-        switch (numskin)
-        {
-        case 1:
-        {
-            fullzapis(nameskin, "Newbie", 64);
-        }
-        break;
-        case 2:
-        {
-            fullzapis(nameskin, "Beginning", 64);
-        }
-        break;
-        case 3:
-        {
-            fullzapis(nameskin, "Apprentice", 64);
-        }
-        break;
-        case 4:
-        {
-            fullzapis(nameskin, "Advanced", 64);
-        }
-        break;
-        case 5:
-        {
-            fullzapis(nameskin, "Professional", 64);
-        }
-        break;
-        case 6:
-        {
-            fullzapis(nameskin, "Specialist", 64);
-        }
-        break;
-        case 7:
-        {
-            fullzapis(nameskin, "Master", 64);
-        }
-        break;
-        case 8:
-        {
-            fullzapis(nameskin, "Best master", 64);
-        }
-        break;
-        case 9:
-        {
-            fullzapis(nameskin, "Legend", 64);
-        }
-        break;
-        case 10:
-        {
-            fullzapis(nameskin, "***BINARY MONSTER***", 64);
-        }
-        break;
-        }
+        fullzapis(nameskin, ranks[numskin], 64);
     }
     else
     {
@@ -423,7 +387,10 @@ void setrank(char* nameskin, int can, int need_record)
     }
     return;
 }
-void setpainter(int vibor2, char skin[4], int bestscore, short need_record[10]) //Рисует Меню настроек ББББББББББББББj
+
+
+
+void drawSettings(int vibor2, char skin[4], int bestscore, short need_record[10])
 {
     bool can = 0;
     char name_skin[64]{ "" };
@@ -444,90 +411,58 @@ void setpainter(int vibor2, char skin[4], int bestscore, short need_record[10]) 
     }
     setrank(name_skin, can, need_record[numskin - 1]);
     std::cout << "SETTINGS:\n";
-    if (vibor2 == 1)
-        std::cout << ">size of place";
-    else
-        std::cout << " size of place";
+    PrintMenuUnit("size of place", 1, vibor2);
     std::cout << "\t\t< " << polsiz << " X " << polsiz << " >" << "\t" << setiskin[0] << "\n";
-    if (vibor2 == 2)
-        std::cout << ">speed of snake";
-    else
-        std::cout << " speed of snake";
+    PrintMenuUnit("speed of snake", 2, vibor2);
     std::cout << "\t\t< " << snakespeed << " m/s >" << "\t" << setiskin[1] << "\t" << name_skin << "\n";
-    if (vibor2 == 3)
-        std::cout << ">collision with edges";
-    else
-        std::cout << " collision with edges";
-    if (dbarrier == 1)
-    {
+    PrintMenuUnit("collision with edges", 3, vibor2);
+    if (dbarrier == 1) {
         std::cout << "\t< YES >";
     }
-    else
-    {
+    else {
         std::cout << "\t< NO >";
     }
     std::cout << "\t\t" << setiskin[2] << "\n";
-    if (vibor2 == 4)
-        std::cout << ">Skin of snake:";
-    else
-        std::cout << " Skin of snake:";
+    PrintMenuUnit("Skin of snake:", 4, vibor2);
     std::cout << "\t\t<" << numskin << ">\n";
-    if (vibor2 == 5)
-        std::cout << ">Save game\n";
-    else
-        std::cout << " Save game\n";
-    if (vibor2 == 6)
-        std::cout << ">Clear save\n";
-    else
-        std::cout << " Clear save\n";
-    if (vibor2 == 7)
-        std::cout << ">back\n";
-    else
-        std::cout << " back\n";
+    PrintMenuUnit("Save game\n", 5, vibor2);
+    PrintMenuUnit("Clear save\n", 6, vibor2);
+    PrintMenuUnit("back\n", 7, vibor2);
     std::cout << "\t\t\t\t";
     return;
 }
 
+
+
 void allmove(int vector, block snakeb[1024])
 {
+    int x_move = 0;
+    int y_move = 0;
+
+    if (vector == 1) {
+        y_move = -1;
+    }
+    if (vector == 2) {
+        x_move = 1;
+    }
+    if (vector == 3) {
+        y_move = 1;
+    }
+    if (vector == 4) {
+        x_move = -1;
+    }
+
     int i = 1;
-    if (vector == 1)
+    snakeb[0].move(x_move, y_move);
+    while (snakeb[i].active)
     {
-        snakeb[0].move(0, -1);
-        while (snakeb[i].active)
-        {
-            snakeb[i].set(snakeb[i - 1].lastx, snakeb[i - 1].lasty);
-            i++;
-        }
-    }
-    if (vector == 2)
-    {
-        snakeb[0].move(1, 0);
-        while (snakeb[i].active)
-        {
-            snakeb[i].set(snakeb[i - 1].lastx, snakeb[i - 1].lasty);
-            i++;
-        }
-    }
-    if (vector == 3)
-    {
-        snakeb[0].move(0, 1);
-        while (snakeb[i].active)
-        {
-            snakeb[i].set(snakeb[i - 1].lastx, snakeb[i - 1].lasty);
-            i++;
-        }
-    }
-    if (vector == 4)
-    {
-        snakeb[0].move(-1, 0);
-        while (snakeb[i].active)
-        {
-            snakeb[i].set(snakeb[i - 1].lastx, snakeb[i - 1].lasty);
-            i++;
-        }
+        snakeb[i].set(snakeb[i - 1].lastx, snakeb[i - 1].lasty);
+        i++;
     }
 }
+
+
+
 bool intersec(int lr, int ud, block snakeb[1024])
 {
     int i = 0;
@@ -541,6 +476,9 @@ bool intersec(int lr, int ud, block snakeb[1024])
     }
     return 1;
 }
+
+
+
 void char_to_char_adder(char* canvas, const char str_for_add[])
 {
     int i = 0;
@@ -556,6 +494,9 @@ void char_to_char_adder(char* canvas, const char str_for_add[])
         i2++;
     }
 }
+
+
+
 int painter(int place[32][32], int score, char skin[4])
 {
     char* canvas = new char[3500]{ "" };
@@ -607,6 +548,9 @@ int painter(int place[32][32], int score, char skin[4])
     delete[] canvas;
     return 0;
 }
+
+
+
 bool long_press(int a, int* dolgnaz)
 {
     if (GetAsyncKeyState(a) == -32768 && *dolgnaz != a)
@@ -619,153 +563,49 @@ bool long_press(int a, int* dolgnaz)
         return 0;
     }
 }
-void ask_ep(int vibor)
+
+
+
+const char* ep_ask = "You are sure exit?\n";
+const char* cp_ask = "You are sure clear your save?\n";
+
+
+
+void ask_print(int choose, const char* text)
 {
     system("cls");
-    std::cout << "You are sure exit?\n";
-    if (vibor == 1)
-    {
-        std::cout << ">";
-    }
-    else
-    {
-        std::cout << " ";
-    }
-    std::cout << "No\n";
-    if (vibor == 2)
-    {
-        std::cout << ">";
-    }
-    else
-    {
-        std::cout << " ";
-    }
-    std::cout << "Yes\n";
+    std::cout << text;
+    PrintMenuUnit("No\n", 1, choose);
+    PrintMenuUnit("Yes\n", 2, choose);
 }
-bool ask_exit(int* dolgnaz)
+
+
+
+bool ask(int* dolgnaz, const char* text)
 {
-    *dolgnaz = 0;
-    short vibor = 1;
-    ask_ep(vibor);
-    while (1)
+    int choose = 1;
+    while (true)
     {
-        if (GetAsyncKeyState(87) == 0 && *dolgnaz == 1)
+        ask_print(choose, text);
+        if (IsKeyJustPressed(87))
         {
-            *dolgnaz = 0;
+            choose = CyclicSwitch(choose, 1, 2, false);
         }
-        if (GetAsyncKeyState(83) == 0 && *dolgnaz == 2)
+        else if (IsKeyJustPressed(83))
         {
-            *dolgnaz = 0;
+            choose = CyclicSwitch(choose, 1, 2, false);
         }
-        if (GetAsyncKeyState(13) == 0 && *dolgnaz == 3)
+        else if (IsKeyJustPressed(13))
         {
-            *dolgnaz = 0;
-        }
-        if (GetAsyncKeyState(87) == -32768 && GetAsyncKeyState(83) == 0 && *dolgnaz != 1)
-        {
-            vibor--;
-            if (vibor < 1)
-                vibor = 2;
-            *dolgnaz = 1;
-            ask_ep(vibor);
-        }
-        if (GetAsyncKeyState(83) == -32768 && GetAsyncKeyState(87) == 0 && *dolgnaz != 2)
-        {
-            vibor++;
-            if (vibor > 2)
-                vibor = 1;
-            *dolgnaz = 2;
-            ask_ep(vibor);
-        }
-        if (GetAsyncKeyState(13) == -32768 && *dolgnaz != 3)
-        {
-            *dolgnaz = 3;
             system("cls");
-            if (vibor == 1)
-            {
-                return 0;
-            }
-            else
-            {
-                return 1;
-            }
+            return choose == 2;
         }
     }
-    return 0;
+    return false;
 }
-void ask_cp(int vibor)
-{
-    system("cls");
-    std::cout << "You are sure clear your save?\n";
-    if (vibor == 1)
-    {
-        std::cout << ">";
-    }
-    else
-    {
-        std::cout << " ";
-    }
-    std::cout << "No\n";
-    if (vibor == 2)
-    {
-        std::cout << ">";
-    }
-    else
-    {
-        std::cout << " ";
-    }
-    std::cout << "Yes\n";
-}
-bool ask_clear(int* dolgnaz)
-{
-    short vibor = 1;
-    ask_cp(vibor);
-    while (1)
-    {
-        if (GetAsyncKeyState(87) == 0 && *dolgnaz == 1)
-        {
-            *dolgnaz = 0;
-        }
-        if (GetAsyncKeyState(83) == 0 && *dolgnaz == 2)
-        {
-            *dolgnaz = 0;
-        }
-        if (GetAsyncKeyState(13) == 0 && *dolgnaz == 3)
-        {
-            *dolgnaz = 0;
-        }
-        if (GetAsyncKeyState(87) == -32768 && GetAsyncKeyState(83) == 0 && *dolgnaz != 1)
-        {
-            vibor--;
-            if (vibor < 1)
-                vibor = 2;
-            *dolgnaz = 1;
-            ask_ep(vibor);
-        }
-        if (GetAsyncKeyState(83) == -32768 && GetAsyncKeyState(87) == 0 && *dolgnaz != 2)
-        {
-            vibor++;
-            if (vibor > 2)
-                vibor = 1;
-            *dolgnaz = 2;
-            ask_ep(vibor);
-        }
-        if (GetAsyncKeyState(13) == -32768 && *dolgnaz != 3)
-        {
-            *dolgnaz = 3;
-            system("cls");
-            if (vibor == 1)
-            {
-                return 0;
-            }
-            else
-            {
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
+
+
+
 int snake(char skin[4], bool* snake_exit, int* dolgnaz)
 {
     squareps = polsiz * polsiz;
@@ -825,44 +665,32 @@ int snake(char skin[4], bool* snake_exit, int* dolgnaz)
         std::cout << "\n";
         while ((clock() - t1) < timetoblock)
         {
-            if (GetAsyncKeyState(87) == -32768 && (snakeb[0].y - snakeb[1].y) != 1)
+            if (IsKeyPressed(87) && (snakeb[0].y - snakeb[1].y) != 1)
             {
                 vector = 1;
             }
-            else
+            else if (IsKeyPressed(68) && (snakeb[1].x - snakeb[0].x) != 1)
             {
-                if (GetAsyncKeyState(68) == -32768 && (snakeb[1].x - snakeb[0].x) != 1)
+                vector = 2;
+            }
+            else if (IsKeyPressed(83) && (snakeb[1].y - snakeb[0].y) != 1)
+            {
+                vector = 3;
+            }
+            else if (IsKeyPressed(65) && (snakeb[0].x - snakeb[1].x) != 1)
+            {
+                vector = 4;
+            }
+            else if (IsKeyPressed(27))
+            {
+                if (ask(dolgnaz, ep_ask) == 1)
                 {
-                    vector = 2;
+                    *snake_exit = 1;
+                    return score;
                 }
                 else
                 {
-                    if (GetAsyncKeyState(83) == -32768 && (snakeb[1].y - snakeb[0].y) != 1)
-                    {
-                        vector = 3;
-                    }
-                    else
-                    {
-                        if (GetAsyncKeyState(65) == -32768 && (snakeb[0].x - snakeb[1].x) != 1)
-                        {
-                            vector = 4;
-                        }
-                        else
-                        {
-                            if (GetAsyncKeyState(27) == -32768)
-                            {
-                                if (ask_exit(dolgnaz) == 1)
-                                {
-                                    *snake_exit = 1;
-                                    return score;
-                                }
-                                else
-                                {
-                                    painter(place, score, skin);
-                                }
-                            }
-                        }
-                    }
+                    painter(place, score, skin);
                 }
             }
         }
@@ -885,6 +713,9 @@ int snake(char skin[4], bool* snake_exit, int* dolgnaz)
     delete[] snakeb;
     return score;
 }
+
+
+
 short skin_max(int bestscore, short need_record[10])
 {
     short max_skin = 0;
@@ -894,17 +725,16 @@ short skin_max(int bestscore, short need_record[10])
     }
     return max_skin;
 }
+
+
+
 bool skin_check(int bestscore, short need_record[10])
 {
-    if (bestscore < need_record[numskin - 1])
-    {
-        return 0;
-    }
-    else
-    {
-        return 1;
-    }
+    return bestscore >= need_record[numskin - 1];
 }
+
+
+
 int main()
 {
     bool snakeexit = 0;
@@ -987,7 +817,7 @@ int main()
                         while (dubleexit == 0)
                         {
                             setskin(skin);
-                            setpainter(vibor2, skin, bestscore, need_record);
+                            drawSettings(vibor2, skin, bestscore, need_record);
                             while (1) //Ждет нажатия клавиш в настройках
                             {
                                 if (IsKeyJustPressed(87))
@@ -1030,7 +860,7 @@ int main()
                             }
                             if (vibvect == 5 && vibor2 == 6)
                             {
-                                if (ask_clear(&dolgnaz))
+                                if (ask(&dolgnaz, cp_ask))
                                 {
                                     clear(&bestscore);
                                 }
