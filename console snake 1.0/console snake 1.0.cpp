@@ -418,7 +418,7 @@ void setRank(char* nameskin, int can, int need_record)
 
 void drawSettings(int vibor2, char skin[4], int bestscore, short need_record[10])
 {
-    bool can = 0;
+    bool draw_skin = 0;
     char name_skin[64]{ "" };
     char setiskin[3][4];
     if (bestscore < need_record[SKIN_NUMBER - 1])
@@ -426,16 +426,16 @@ void drawSettings(int vibor2, char skin[4], int bestscore, short need_record[10]
         skinTextCopy(setiskin[0], "X X");
         skinTextCopy(setiskin[1], " X ");
         skinTextCopy(setiskin[2], "X X");
-        can = 0;
+        draw_skin = 0;
     }
     else
     {
         skinTextCopy(setiskin[0], skin);
         skinTextCopy(setiskin[1], skin);
         skinTextCopy(setiskin[2], skin);
-        can = 1;
+        draw_skin = 1;
     }
-    setRank(name_skin, can, need_record[SKIN_NUMBER - 1]);
+    setRank(name_skin, draw_skin, need_record[SKIN_NUMBER - 1]);
     std::cout << "SETTINGS:\n";
     PrintMenuUnit("size of place", 1, vibor2);
     std::cout << "\t\t< " << FIELD_SIZE << " X " << FIELD_SIZE << " >" << "\t" << setiskin[0] << "\n";
@@ -713,40 +713,39 @@ bool skinCheck(int bestscore, short need_record[10])
 
 void settingsProcess(char* skin, int best_score, short* need_record) {
     system("cls");
-    int vibvect = 1;
-    int vibor2 = 1;
+    int choose = 1;
     bool exit = false;
     while (!exit)
     {
         setskin(skin);
-        drawSettings(vibor2, skin, best_score, need_record);
+        drawSettings(choose, skin, best_score, need_record);
 
         if (IsKeyJustPressed(87))
         {
-            vibor2 = CyclicSwitch(vibor2, 1, 7, false);
+            choose = CyclicSwitch(choose, 1, 7, false);
         }
         if (IsKeyJustPressed(83))
         {
-            vibor2 = CyclicSwitch(vibor2, 1, 7, true);
+            choose = CyclicSwitch(choose, 1, 7, true);
         }
-        if (IsKeyJustPressed(13) && vibor2 == 7)
+        if (IsKeyJustPressed(13) && choose == 7)
         {
             exit = true;
         }
-        if (IsKeyJustPressed(13) && vibor2 == 6)
+        if (IsKeyJustPressed(13) && choose == 6)
         {
             if (ask(cp_ask))
             {
                 clearSave(&best_score);
             }
         }
-        if (IsKeyJustPressed(13) && vibor2 == 5)
+        if (IsKeyJustPressed(13) && choose == 5)
         {
             saveGame(&best_score);
         }
         if (IsKeyJustPressed(68) || IsKeyJustPressed(65))
         {
-            switch (vibor2)
+            switch (choose)
             {
             case 1:
                 FIELD_SIZE = CyclicSwitch(FIELD_SIZE, 16, 32, IsKeyJustPressed(68));
@@ -763,7 +762,6 @@ void settingsProcess(char* skin, int best_score, short* need_record) {
             }
         }
         system("cls");
-        vibvect = 1;
     }
     if (skinCheck(best_score, need_record) == 0)
     {
@@ -781,11 +779,11 @@ void settingsProcess(char* skin, int best_score, short* need_record) {
 int main()
 {
     bool snakeexit = 0;
-    short need_record[10]{ 0, 50, 100, 200, 300, 400, 550, 700, 850, 1024 };
+    short needed_score[10]{ 0, 50, 100, 200, 300, 400, 550, 700, 850, 1024 };
     char skin[4] = "";
     int best_score = 0;
     int score = 0;
-    int vibor = 1;
+    int choose = 1;
     bool exit = false;
     loadGame(&best_score);
     srand(time(0));
@@ -800,28 +798,28 @@ int main()
             const char* menu_units[5]{"Play\n", "Settings\n", "Help\n", "Authors\n", "Save and exit\n"};
             for (int i = 0; i < 5; i++)
             {
-                PrintMenuUnit(menu_units[i], i + 1, vibor);
+                PrintMenuUnit(menu_units[i], i + 1, choose);
             }
 
             if (IsKeyJustPressed(87))
             {
-                vibor = CyclicSwitch(vibor, 1, 5, false);
+                choose = CyclicSwitch(choose, 1, 5, false);
             }
             if (IsKeyJustPressed(83))
             {
-                vibor = CyclicSwitch(vibor, 1, 5, true);
+                choose = CyclicSwitch(choose, 1, 5, true);
             }
             if (IsKeyJustPressed(13))
             {
-                if (vibor == 1)
+                if (choose == 1)
                 {
                     score = snakeProcess(skin, &snakeexit);
                 }
-                if (vibor == 2)
+                if (choose == 2)
                 {
-                    settingsProcess(skin, best_score, need_record);
+                    settingsProcess(skin, best_score, needed_score);
                 }
-                if (vibor == 3)
+                if (choose == 3)
                 {
                     system("cls");
                     std::cout << "Help:\n";
@@ -830,7 +828,7 @@ int main()
                     std::cout << ">Back\n";
                     WaitKeyPress(13);
                 }
-                if (vibor == 4)
+                if (choose == 4)
                 {
                     system("cls");
                     std::cout << "Authors:\n";
@@ -842,7 +840,7 @@ int main()
                     std::cout << ">Back\n";
                     WaitKeyPress(13);
                 }
-                if (vibor == 5)
+                if (choose == 5)
                 {
                     saveGame(&best_score);
                     return 0;
