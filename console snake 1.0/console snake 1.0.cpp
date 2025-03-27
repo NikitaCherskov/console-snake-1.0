@@ -1,6 +1,4 @@
-﻿// Console Snake 0.1.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
-#include <string>
+﻿#include <string>
 #include <Windows.h>
 #include <ctime>
 #include <iostream>
