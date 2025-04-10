@@ -384,6 +384,7 @@ void addCharToChar(char* canvas, const char str_for_add[])
         i++;
         i2++;
     }
+    canvas[i] = '\0';
 }
 
 

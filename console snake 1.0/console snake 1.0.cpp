@@ -1,9 +1,10 @@
-﻿#include "Game.h"
-#include "Tests.h"
+﻿#include "Tests.h"
+#include "Game.h"
 
 
 
 int main()
 {
-    return mainProcess();
+    startTests();
+    return 0;
 }
