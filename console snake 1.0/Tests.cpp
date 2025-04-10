@@ -1,11 +1,13 @@
 #include <windows.h>
 #include <iostream>
+#include <cassert>
 #include "Tests.h"
 using namespace std;
+#define assertm(exp, msg) assert((void(msg), exp))
 
 
 
-string cyclicSwitchTest() {
+void cyclicSwitchTest() {
 	int val1 = 5;
 	val1 = CyclicSwitch(val1, 0, 7, true);
 	int val2 = 5;
@@ -15,29 +17,25 @@ string cyclicSwitchTest() {
 	int val4 = 0;
 	val4 = CyclicSwitch(val4, 0, 7, false);
 
-	if (val1 != 6 || val2 != 0 || val3 != -1 || val4 != 7) {
-		return "The CyclicSwitch() does not work correctly!\n";
-	}
-	return "The CyclicSwitch() works correctly\n";
+	const char* msg = "The CyclicSwitch() does not work correctly!\n";
+	assertm(val1 == 6 && val2 == 0 && val3 == -1 && val4 == 7, msg);
 }
 
 
 
-string saveLoadTest() {
+void saveLoadTest() {
 	int old_best_score = 100;
 	int new_best_score = 0;
 	saveGame(&old_best_score);
 	loadGame(&new_best_score);
 
-	if (old_best_score != new_best_score) {
-		return "The saveGame() or loadGame() does not work correctly!\n";
-	}
-	return "The saveGame() and loadGame() works correctly\n";
+	const char* msg = "The saveGame() or loadGame() does not work correctly!\n";
+	assertm(old_best_score == new_best_score, msg);
 }
 
 
 
-string keyPressTest() {
+void keyPressTest() {
 	WORD vkCode = 0x41;
 	INPUT input;
 	input.type = INPUT_KEYBOARD;
@@ -47,51 +45,48 @@ string keyPressTest() {
 	input.ki.dwExtraInfo = 0;
 	SendInput(1, &input, sizeof(INPUT));
 
-	string ret;
-	if (IsKeyJustPressed(vkCode) == false) {
-		ret = "The IsKeyJustPressed() does not work correctly!\n";
-	}
-	else {
-		ret = "The IsKeyJustPressed() works correctly\n";
-	}
+	bool is_key_just_pressed = IsKeyJustPressed(vkCode);
 
 	input.ki.dwFlags = KEYEVENTF_KEYUP;
 	SendInput(1, &input, sizeof(INPUT));
 
-	return ret;
+	const char* msg = "The IsKeyJustPressed() does not work correctly!\n";
+	assertm(is_key_just_pressed == true, msg);
 }
 
 
 
-string textCopyTest() {
+void textCopyTest() {
 	char text[64];
 	textCopy(text, "text1", 6);
 	string str(text);
-	if (str != "text1") {
-		return "The textCopy() does not work correctly!\n";
-	}
-	return "The textCopy() works correctly\n";
+	const char* msg = "The textCopy() does not work correctly!\n";
+	assertm(str == "text1", msg);
 }
 
 
 
-string addCharToCharTest() {
+void addCharToCharTest() {
 	char* canvas = new char[64]{""};
 	addCharToChar(canvas, "text1");
 	addCharToChar(canvas, "text2");
 	string str(canvas);
-	if (str != "text1text2") {
-		return "The addCharToChar() does not work correctly!\n";
-	}
-	return "The addCharToChar() works correctly\n";
+	const char* msg = "The addCharToChar() does not work correctly!\n";
+	assertm(str == "text1text2", msg);
 }
 
 
 
 void startTests() {
-	std::cout << cyclicSwitchTest();
-	std::cout << saveLoadTest();
-	std::cout << keyPressTest();
-	std::cout << textCopyTest();
-	std::cout << addCharToCharTest();
+	std::cout << "tests started\n";
+	cyclicSwitchTest();
+	std::cout << "checkpoint #1 passed\n";
+	saveLoadTest();
+	std::cout << "checkpoint #2 passed\n";
+	keyPressTest();
+	std::cout << "checkpoint #3 passed\n";
+	textCopyTest();
+	std::cout << "checkpoint #4 passed\n";
+	addCharToCharTest();
+	std::cout << "tests passed\n";
 }
