@@ -19,25 +19,19 @@ void spawnLocationSelection(int* x, int* y, int place[32][32])
 {
     int randcell;
     int i;
-    int a;
-    int b;
     int amount = 0;
     cell* emty_place = new cell[getFieldSizeLink() * getFieldSizeLink()];
     i = 0;
-    a = 0;
-    while (a < getFieldSizeLink())
+    for (int a = 0; a < getFieldSizeLink(); a++)
     {
-        b = 0;
-        while (b < getFieldSizeLink())
+        for (int b = 0; b < getFieldSizeLink(); b++)
         {
             if (place[a][b] == 0)
             {
                 emty_place[amount].set(a, b);
                 amount++;
             }
-            b++;
         }
-        a++;
     }
     randcell = rand() % amount;
     *y = emty_place[randcell].x;
@@ -119,14 +113,12 @@ void moveAll(int vector, block snakeb[1024])
 
 bool intersec(int lr, int ud, block snakeb[1024])
 {
-    int i = 0;
-    while (snakeb[i].active == 1)
+    for (int i = 0; snakeb[i].active == 1; i++)
     {
         if (snakeb[i].x == lr && snakeb[i].y == ud)
         {
             return 0;
         }
-        i++;
     }
     return 1;
 }
@@ -211,7 +203,7 @@ int snakeProcess(char skin[4], bool* snake_exit)
     block* snakeb = new block[getFieldSizeLink() * getFieldSizeLink()];
     spawnSnake(snakeb, length);
     std::cout << "\n";
-    while (1)
+    while (true)
     {
         createPlace(place);
         addSnakeOnPlace(snakeb, place);
@@ -296,7 +288,7 @@ int mainProcess() {
     loadGame(&best_score);
     srand(time(0));
     setskin(skin);
-    while (1)
+    while (true)
     {
         exit = false;
         while (!exit)
