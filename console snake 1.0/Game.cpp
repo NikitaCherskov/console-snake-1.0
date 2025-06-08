@@ -11,6 +11,9 @@
 #include <iostream>
 #include <cstdlib>
 
+//----------------новые функции-----------------
+
+
 //-----------------------------------------------------
 void spawnLocationSelection(int* x, int* y, int place[32][32])
 {
@@ -87,6 +90,8 @@ int checkCollide(block snakeb, int place[32][32], int l)
 }
 
 //-----------------------------------------------------
+
+
 void moveAll(int vector, block snakeb[1024])
 {
     int x_move = 0;
@@ -166,7 +171,7 @@ int painter(int place[32][32], int score, char skin[4])
     return 0;
 }
 
-void createSnake(block* snakeb, int length) {
+void spawnSnake(block* snakeb, int length) {
     int halfplace = getFieldSizeLink() / 2;
     for (int i = 0; i < length; i++)
     {
@@ -188,7 +193,6 @@ void addSnakeOnPlace(block* snakeb, int place[32][32]) {
     for (int i = 0; snakeb[i].active == 1; i++)
     {
         place[snakeb[i].y][snakeb[i].x] = 1;
-        i++;
     }
 }
 
@@ -203,13 +207,9 @@ int snakeProcess(char skin[4], bool* snake_exit)
     int ud = 0;
     int vector = 1;
     clock_t t1;
-    int i;
-    int a;
-    int b;
     int place[32][32];
     block* snakeb = new block[getFieldSizeLink() * getFieldSizeLink()];
-    
-    createSnake(snakeb, length);
+    spawnSnake(snakeb, length);
     std::cout << "\n";
     while (1)
     {
@@ -274,6 +274,15 @@ int snakeProcess(char skin[4], bool* snake_exit)
     }
     delete[] snakeb;
     return score;
+}
+
+void printGameOver() {
+    const char* owr_txt_1 = "XXXX XXXX XX XX XXXX   XXXX  X  X XXXX X XX \n";
+    const char* owr_txt_2 = "X    X  X X X X X      X  X  X  X X    XX  X\n";
+    const char* owr_txt_3 = "X XX XXXX X X X XXXX   X  X  X  X XXXX X    \n";
+    const char* owr_txt_4 = "X  X X  X X X X X      X  X  X  X X    X    \n";
+    const char* owr_txt_5 = "XXXX X  X X X X XXXX   XXXX   XX  XXXX X    \n";
+    std::cout << owr_txt_1 << owr_txt_2 << owr_txt_3 << owr_txt_4 << owr_txt_5;
 }
 
 int mainProcess() {
@@ -358,12 +367,7 @@ int mainProcess() {
         }
         else
         {
-            const char* owr_txt_1 = "XXXX XXXX XX XX XXXX   XXXX  X  X XXXX X XX \n";
-            const char* owr_txt_2 = "X    X  X X X X X      X  X  X  X X    XX  X\n";
-            const char* owr_txt_3 = "X XX XXXX X X X XXXX   X  X  X  X XXXX X    \n";
-            const char* owr_txt_4 = "X  X X  X X X X X      X  X  X  X X    X    \n";
-            const char* owr_txt_5 = "XXXX X  X X X X XXXX   XXXX   XX  XXXX X    \n";
-            std::cout << owr_txt_1 << owr_txt_2 << owr_txt_3 << owr_txt_4 << owr_txt_5;
+            printGameOver();
             if (score >= getFieldSizeLink() * getFieldSizeLink())
             {
                 std::cout << "\n\nYou won! You have reached the maximum value on this place!";
