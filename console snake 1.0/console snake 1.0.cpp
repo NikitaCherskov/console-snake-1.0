@@ -5,6 +5,6 @@
 
 int main()
 {
-    startTests();
+    mainProcess();
     return 0;
 }

@@ -139,13 +139,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Block.cpp" />
+    <ClCompile Include="Cell.cpp" />
     <ClCompile Include="console snake 1.0.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="SaveLoad.cpp" />
     <ClCompile Include="Tests.cpp" />
+    <ClCompile Include="TextUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Block.h" />
+    <ClInclude Include="Cell.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="SaveLoad.h" />
     <ClInclude Include="Tests.h" />
+    <ClInclude Include="TextUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
