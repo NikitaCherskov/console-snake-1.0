@@ -17,10 +17,10 @@
 //-----------------------------------------------------
 void spawnLocationSelection(int* x, int* y, int place[32][32])
 {
-    int randcell;
+    int random_cell;
     int i;
     int amount = 0;
-    cell* emty_place = new cell[getFieldSizeLink() * getFieldSizeLink()];
+    cell* empty_place = new cell[getFieldSizeLink() * getFieldSizeLink()];
     i = 0;
     for (int a = 0; a < getFieldSizeLink(); a++)
     {
@@ -28,15 +28,15 @@ void spawnLocationSelection(int* x, int* y, int place[32][32])
         {
             if (place[a][b] == 0)
             {
-                emty_place[amount].set(a, b);
+                empty_place[amount].set(a, b);
                 amount++;
             }
         }
     }
-    randcell = rand() % amount;
-    *y = emty_place[randcell].x;
-    *x = emty_place[randcell].y;
-    delete[] emty_place;
+    random_cell = rand() % amount;
+    *y = empty_place[random_cell].x;
+    *x = empty_place[random_cell].y;
+    delete[] empty_place;
 }
 
 //Обработка смерти-------------------------------------
@@ -172,11 +172,11 @@ void spawnSnake(block* snakeb, int length) {
 }
 
 void createPlace(int place[32][32]) {
-    for (int b = 0; b < 32; b++)
+    for (int i = 0; i < 32; i++)
     {
-        for (int a = 0; a < 32; a++)
+        for (int j = 0; j < 32; j++)
         {
-            place[b][a] = 0;
+            place[i][j] = 0;
         }
     }
 }
@@ -190,82 +190,82 @@ void addSnakeOnPlace(block* snakeb, int place[32][32]) {
 
 int snakeProcess(char skin[4], bool* snake_exit)
 {
-    int score = 0;
-    int timetoblock = 1000 / getSnakeSpeedLink();
-    int length = 3;
-    int eat_resp = 1;
-    int col = 0;
-    int lr = 0;
-    int ud = 0;
-    int vector = 1;
-    clock_t t1;
+    int game_score = 0;
+    int step_duration = 1000 / getSnakeSpeedLink();
+    int snake_length = 3;
+    bool required_food_reposition = true;
+    int collider_type = 0;
+    int food_pos_x = 0;
+    int food_pos_y = 0;
+    int move_vector = 1;
+    clock_t clock_mark;
     int place[32][32];
-    block* snakeb = new block[getFieldSizeLink() * getFieldSizeLink()];
-    spawnSnake(snakeb, length);
+    block* snake_block = new block[getFieldSizeLink() * getFieldSizeLink()];
+    spawnSnake(snake_block, snake_length);
     std::cout << "\n";
     while (true)
     {
         createPlace(place);
-        addSnakeOnPlace(snakeb, place);
-        if (eat_resp == 1) //если еда была в прошлый раз съедена, переразместить еду и удлинится
+        addSnakeOnPlace(snake_block, place);
+        if (required_food_reposition == true) //если еда была в прошлый раз съедена, переразместить еду и удлинится
         {
-            spawnLocationSelection(&lr, &ud, place);
-            eat_resp = 0;
+            spawnLocationSelection(&food_pos_x, &food_pos_y, place);
+            required_food_reposition = false;
         }
-        place[ud][lr] = 2;
+        place[food_pos_y][food_pos_x] = 2;
         system("cls");
-        painter(place, score, skin);
-        t1 = clock();
+        painter(place, game_score, skin);
+        clock_mark = clock();
         std::cout << "\n";
-        while ((clock() - t1) < timetoblock)
+        while ((clock() - clock_mark) < step_duration)
         {
-            if (IsKeyPressed(87) && (snakeb[0].y - snakeb[1].y) != 1)
+            if (IsKeyPressed(87) && (snake_block[0].y - snake_block[1].y) != 1)
             {
-                vector = 1;
+                move_vector = 1;
             }
-            else if (IsKeyPressed(68) && (snakeb[1].x - snakeb[0].x) != 1)
+            else if (IsKeyPressed(68) && (snake_block[1].x - snake_block[0].x) != 1)
             {
-                vector = 2;
+                move_vector = 2;
             }
-            else if (IsKeyPressed(83) && (snakeb[1].y - snakeb[0].y) != 1)
+            else if (IsKeyPressed(83) && (snake_block[1].y - snake_block[0].y) != 1)
             {
-                vector = 3;
+                move_vector = 3;
             }
-            else if (IsKeyPressed(65) && (snakeb[0].x - snakeb[1].x) != 1)
+            else if (IsKeyPressed(65) && (snake_block[0].x - snake_block[1].x) != 1)
             {
-                vector = 4;
+                move_vector = 4;
             }
             else if (IsKeyPressed(27))
             {
                 if (ask(getEPAsk()) == 1)
                 {
                     *snake_exit = 1;
-                    return score;
+                    return game_score;
                 }
                 else
                 {
-                    painter(place, score, skin);
+                    painter(place, game_score, skin);
                 }
             }
         }
-        col = checkCollide(snakeb[0], place, vector);
-        if (col == 1)
+        collider_type = checkCollide(snake_block[0], place, move_vector);
+        if (collider_type == 1)
         {
-            return score;
+            return game_score;
         }
-        if (col == 2) //что происходит если еда была съедена
+        if (collider_type == 2) //что происходит если еда была съедена
         {
-            timetoblock = timetoblock * 0.98;
-            score++;
-            length++;
-            snakeb[length - 1].active = 1;
-            eat_resp = 1;
+            step_duration = step_duration * 0.98;
+            game_score++;
+            snake_length++;
+            snake_block[snake_length - 1].active = 1;
+            required_food_reposition = true;
         }
-        col = 0;
-        moveAll(vector, snakeb);
+        collider_type = 0;
+        moveAll(move_vector, snake_block);
     }
-    delete[] snakeb;
-    return score;
+    delete[] snake_block;
+    return game_score;
 }
 
 void printGameOver() {
@@ -278,48 +278,47 @@ void printGameOver() {
 }
 
 int mainProcess() {
-    bool snakeexit = 0;
+    bool required_exit = 0;
     short needed_score[10]{ 0, 50, 100, 200, 300, 400, 550, 700, 850, 1024 };
     char skin[4] = "";
     int best_score = 0;
-    int score = 0;
-    int choose = 1;
-    bool exit = false;
+    int game_score = 0;
+    int menu_choise = 1;
     loadGame(&best_score);
     srand(time(0));
     setskin(skin);
     while (true)
     {
-        exit = false;
-        while (!exit)
+        while (true)
         {
             std::cout << "Your best score: " << best_score << "\n\nMENU:\n";
 
             const char* menu_units[5]{ "Play\n", "Settings\n", "Help\n", "Authors\n", "Save and exit\n" };
             for (int i = 0; i < 5; i++)
             {
-                PrintMenuUnit(menu_units[i], i + 1, choose);
+                PrintMenuUnit(menu_units[i], i + 1, menu_choise);
             }
 
             if (IsKeyJustPressed(87))
             {
-                choose = CyclicSwitch(choose, 1, 5, false);
+                menu_choise = CyclicSwitch(menu_choise, 1, 5, false);
             }
             if (IsKeyJustPressed(83))
             {
-                choose = CyclicSwitch(choose, 1, 5, true);
+                menu_choise = CyclicSwitch(menu_choise, 1, 5, true);
             }
             if (IsKeyJustPressed(13))
             {
-                if (choose == 1)
+                if (menu_choise == 1)
                 {
-                    score = snakeProcess(skin, &snakeexit);
+                    game_score = snakeProcess(skin, &required_exit);
+                    break;
                 }
-                if (choose == 2)
+                if (menu_choise == 2)
                 {
                     settingsProcess(skin, best_score, needed_score);
                 }
-                if (choose == 3)
+                if (menu_choise == 3)
                 {
                     system("cls");
                     std::cout << "Help:\n";
@@ -328,7 +327,7 @@ int mainProcess() {
                     std::cout << ">Back\n";
                     WaitKeyPress(13);
                 }
-                if (choose == 4)
+                if (menu_choise == 4)
                 {
                     system("cls");
                     std::cout << "Authors:\n";
@@ -340,7 +339,7 @@ int mainProcess() {
                     std::cout << ">Back\n";
                     WaitKeyPress(13);
                 }
-                if (choose == 5)
+                if (menu_choise == 5)
                 {
                     saveGame(&best_score);
                     return 0;
@@ -348,25 +347,25 @@ int mainProcess() {
             }
             system("cls");
         }
-        if (score > best_score)
+        if (game_score > best_score)
         {
-            best_score = score;
+            best_score = game_score;
         }
         system("cls");
-        if (snakeexit == 1)
+        if (required_exit == 1)
         {
-            std::cout << "You been exit, your score: " << score << "\n\n>Continue";
+            std::cout << "You been exit, your score: " << game_score << "\n\n>Continue";
         }
         else
         {
             printGameOver();
-            if (score >= getFieldSizeLink() * getFieldSizeLink())
+            if (game_score >= getFieldSizeLink() * getFieldSizeLink())
             {
                 std::cout << "\n\nYou won! You have reached the maximum value on this place!";
             }
-            std::cout << "\n\nYour score : " << score << "\n\n>Continue";
+            std::cout << "\n\nYour score : " << game_score << "\n\n>Continue";
         }
-        snakeexit = 0;
+        required_exit = 0;
         WaitKeyPress(13);
         system("cls");
     }
